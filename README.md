@@ -1,174 +1,235 @@
-<div align="center">🧊 2D to 3D
+<div align="center">
 
-Transform 2D Images into 3D Models
+# 🧊 2D to 3D
+### Turn a Flat 2D Image into an Interactive 3D Model, Right in Your Browser
 
-""Python" (https://img.shields.io/badge/Language-Python_3-3776ab?style=for-the-badge&logo=python&logoColor=white)" (https://www.python.org/)
-""AI" (https://img.shields.io/badge/AI-Deep_Learning-8e44ad?style=for-the-badge)" (https://pytorch.org/)
-""Computer Vision" (https://img.shields.io/badge/Vision-Computer_Vision-5c3ee8?style=for-the-badge)" (https://opencv.org/)
-""GitHub" (https://img.shields.io/badge/Repository-GitHub-181717?style=for-the-badge&logo=github)" (https://github.com/KiranJITdesign/2d-to-3d)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://2d-to-3d-phi.vercel.app)
+[![React](https://img.shields.io/badge/Frontend-React_19-61dafb?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Three.js](https://img.shields.io/badge/3D_Engine-Three.js-ec4899?style=for-the-badge&logo=threedotjs&logoColor=white)](https://threejs.org/)
+[![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178c6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Build-Vite-646cff?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Styling-Tailwind_CSS-06b6d4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
-A computer vision project that transforms 2D images into 3D representations using image processing and depth estimation techniques.
+*A computer vision web app that removes the background from an image, estimates depth from its shape, and builds a smooth, solid 3D mesh you can orbit, tweak and export.*
 
-"Features" (#-features) • "How It Works" (#-how-it-works) • "Quick Start" (#-quick-start) • "Usage" (#-usage) • "Project Structure" (#-project-structure) • "Future Enhancements" (#-future-enhancements)
+[Live Demo](https://2d-to-3d-phi.vercel.app) • [Features](#-features) • [How It Works](#-how-it-works) • [Settings](#-settings) • [Quick Start](#-quick-start) • [Deploy](#-deploy-on-vercel) • [Future Scope](#-future-scope)
 
-</div>---
-
-🌍 Overview
-
-2D to 3D is a computer vision project designed to bridge the gap between two-dimensional images and three-dimensional visualization.
-
-The project explores how a single 2D image can be processed, analyzed, and transformed into a 3D representation using image processing and depth information.
-
-The goal is to make 3D reconstruction more accessible by simplifying the process of converting ordinary images into 3D visual outputs.
+</div>
 
 ---
 
-✨ Features
+## 🌍 Overview
 
-- 🖼️ 2D Image Input: Process images as the input for 3D transformation.
-- 🧠 Intelligent Image Processing: Analyze image information for transformation.
-- 📐 Depth Estimation: Extract spatial depth information from 2D images.
-- 🧊 3D Reconstruction: Generate a three-dimensional representation from image data.
-- 🎨 Visual Representation: Transform flat images into immersive 3D outputs.
-- ⚡ Automated Processing: Simplify the image-to-3D conversion workflow.
-- 🔬 Computer Vision: Explore practical applications of image processing and 3D reconstruction.
+Most 3D reconstruction tools need special hardware, multiple photos or a heavy installation. **2D to 3D** explores how far a single ordinary image can go.
+
+The app processes your image entirely in the browser:
+1. **Image processing:** Separates the subject from the background and cleans up its silhouette.
+2. **Depth estimation:** Builds a depth map from the shape of the subject, with optional AI depth hints blended in.
+3. **3D reconstruction:** Turns the depth map into a watertight mesh with a front surface and a mirrored back shell.
+4. **Interactive viewing:** Lets you orbit, relight, restyle and export the result with Three.js.
 
 ---
 
-🧱 How It Works
+## ✨ Features
 
-The general image-to-3D workflow consists of the following stages:
+- 🖼️ **Image input:** Start from one of six built-in sample images (sneaker, helmet, chair, vase, game controller, headphones) or upload your own.
+- ✂️ **Background removal:** Flood-fills inward from the image borders, or uses the image's own transparency when it has one.
+- 📐 **Depth from silhouette:** A distance transform plus shape-aware inflation gives rounded, believable volume.
+- 🧱 **Shape profiles:** Choose `auto`, `cylindrical`, `spherical` or `boxy` so vases, balls and hard-surface objects keep their proportions.
+- 🧠 **Optional AI depth hints:** Can blend in a Depth-Anything map (Transformers.js) and a Gemini depth grid when they are available.
+- 🧊 **Watertight mesh:** Front surface, mirrored back shell and stitched rim, followed by Laplacian vertex smoothing.
+- 🎛️ **Tunable output:** Adjust depth, resolution, smoothing, background cutoff, taper and more.
+- 🎥 **Interactive viewer:** Orbit controls, turntable, render modes, lighting presets, wireframe overlay and material controls.
+- 📦 **Export:** Download the finished model as a glTF / GLB file.
 
+---
+
+## 🧱 How It Works
+
+```mermaid
 graph TD
-    A["📷 2D Image Input"] --> B["🖼️ Image Preprocessing"]
-    B --> C["🧠 Image Analysis"]
-    C --> D["📐 Depth Estimation"]
-    D --> E["🧊 3D Reconstruction"]
-    E --> F["🎨 3D Visualization"]
-    F --> G["📦 Output"]
+    subgraph Input ["Input"]
+        Img["Sample image or your own upload"]
+    end
 
-Workflow Explanation
+    subgraph Depth ["Depth Processing (in the browser)"]
+        Canvas["Downscale on a canvas (256 px wide)"]
+        BG["Background removal: border flood-fill or native alpha"]
+        Mask["Mask cleanup: closing and smoothing"]
+        Dist["Distance transform from the silhouette edge"]
+        Inflate["Shape-aware inflation (auto, cylindrical, spherical, boxy)"]
+        Neural["Optional neural depth hints (Depth-Anything, Gemini)"]
+        Smooth["Anti-spike clamp and Gaussian smoothing"]
+    end
 
-1. Image Input: Provide a 2D image as the source.
-2. Preprocessing: Prepare the image for further processing.
-3. Image Analysis: Extract relevant visual information.
-4. Depth Estimation: Determine depth information from the image.
-5. 3D Reconstruction: Generate a 3D representation using the processed information.
-6. Visualization: Display or export the generated 3D result.
+    subgraph Mesh ["Mesh Builder"]
+        Front["Front surface from the depth map"]
+        Back["Mirrored back shell and rim stitching"]
+        Lap["Laplacian vertex smoothing"]
+    end
+
+    subgraph Viewer ["Three.js Viewer"]
+        View["Orbit controls, turntable, render modes, lighting presets"]
+        Export["Export GLB"]
+    end
+
+    Img --> Canvas --> BG --> Mask --> Dist --> Inflate --> Smooth
+    Neural --> Inflate
+    Smooth --> Front --> Back --> Lap --> View --> Export
+```
+
+| Step | Stage | What happens |
+| :---: | :--- | :--- |
+| **1** | **Image input** | Pick a sample image or upload your own. |
+| **2** | **Background removal** | The subject is separated from the background and its silhouette mask is cleaned up. |
+| **3** | **Depth estimation** | Distance from the silhouette edge is inflated into volume using the chosen shape profile, then blended with optional AI depth. |
+| **4** | **Smoothing** | Spikes are clamped and the depth map is smoothed. Depth, normal and mask maps are generated. |
+| **5** | **3D reconstruction** | A front surface and a mirrored back shell are meshed and stitched along the silhouette. |
+| **6** | **Visualization** | Orbit around the model, change lighting and render mode, and tune the settings. |
+| **7** | **Export** | Save the generated 3D model. |
 
 ---
 
-📂 Repository Structure
+## 🔧 Settings
 
+Default values used by the converter:
+
+| Setting | Default | What it controls |
+| :--- | :---: | :--- |
+| Depth intensity | `1.65` | How far the surface pushes out in 3D. |
+| Resolution | `128` | Mesh grid detail (the builder clamps it between 48 and 180). |
+| Smooth passes | `3` | How much the depth map is smoothed. |
+| Background cutoff | `0.15` | How aggressively the background is removed. |
+| Extrusion taper | `0.95` | How strongly the back shell mirrors the front. |
+| Shape profile | `auto` | `auto`, `cylindrical`, `spherical` or `boxy` volume prior. |
+| Watertight solid | on | Builds a closed solid instead of a relief. |
+| Remove background | on | Isolates the subject. |
+| Anti-spike filter | on | Clamps sharp depth spikes. |
+| Invert depth | off | Flips the depth direction. |
+| Render mode | `textured` | How the mesh is drawn. |
+| Lighting preset | `studio` | Light setup in the viewer. |
+| Turntable speed | `0.6` | Auto-rotation speed. |
+| Roughness / Metalness | `0.28` / `0.22` | Material look. |
+
+---
+
+## 📂 Repository Structure
+
+```text
 2d-to-3d/
-│
-├── README.md          # Project documentation
-├── app.py            # Main application (if applicable)
-├── requirements.txt    # Python dependencies (if applicable)
-├── static/            # Static assets (if applicable)
-├── templates/         # Application templates (if applicable)
-└── outputs/           # Generated results (if applicable)
+├── src/                          # App source files
+├── ai_2d_to_3d_converter.tsx     # Converter: image processing, mesh builder and 3D viewer
+├── index.html                    # Vite entry HTML
+├── package.json                  # Dependencies and scripts
+├── package-lock.json             # Locked dependency versions
+├── vite.config.ts                # Vite configuration
+├── tailwind.config.js            # Tailwind CSS configuration
+├── postcss.config.js             # PostCSS configuration
+├── tsconfig.json                 # TypeScript configuration
+├── tsconfig.node.json            # TypeScript configuration for Vite config files
+├── .gitignore
+└── README.md                     # Project documentation
+```
 
 ---
 
-🚀 Quick Start
+## 🧰 Tech Stack
 
-Prerequisites
+| Technology | Purpose |
+| :--- | :--- |
+| **React 19** | User interface |
+| **TypeScript** | Typed application code |
+| **Three.js** | 3D rendering, OrbitControls, GLTF / OBJ loaders and GLTF exporter |
+| **Vite** | Dev server and production build |
+| **Tailwind CSS 3** | Styling |
+| **lucide-react** | Icons |
 
-- Python 3.10+
-- Git
-- pip
-- A compatible system for running the project
+---
 
-1. Clone the Repository
+## 🚀 Quick Start
 
+### Prerequisites
+- **Node.js** (a recent LTS version)
+- **npm**
+- **Git**
+
+### 1. Clone the Repository
+```bash
 git clone https://github.com/KiranJITdesign/2d-to-3d.git
 cd 2d-to-3d
+```
 
-2. Create a Virtual Environment
+### 2. Install Dependencies
+```bash
+npm install
+```
 
-python -m venv .venv
+### 3. Start the Dev Server
+```bash
+npm run dev
+```
+Open the address Vite prints (usually `http://localhost:5173`). The server also listens on your local network, so you can open it from a phone on the same Wi-Fi.
 
-3. Activate the Virtual Environment
-
-Windows (PowerShell):
-
-.venv\Scripts\Activate.ps1
-
-Windows (CMD):
-
-.venv\Scripts\activate
-
-Linux / macOS:
-
-source .venv/bin/activate
-
-4. Install Dependencies
-
-pip install -r requirements.txt
-
-5. Run the Application
-
-python app.py
-
-Note: Update the installation and execution commands according to the actual files and configuration in your repository.
+### Other Scripts
+| Command | What it does |
+| :--- | :--- |
+| `npm run dev` | Starts the Vite dev server. |
+| `npm run build` | Creates a production build. |
+| `npm run preview` | Serves the production build locally. |
 
 ---
 
-🎮 Usage
+## 🎮 Usage
 
-1. Launch the application.
-2. Upload or select a 2D image.
-3. Start the image processing or conversion process.
-4. Wait for the 3D reconstruction to complete.
-5. Preview or visualize the generated output.
-6. Save or export the resulting 3D representation, if supported.
-
----
-
-🛠️ Technologies Used
-
-Technology| Purpose
-Python| Core programming language
-Computer Vision| Image processing and visual analysis
-Deep Learning| AI-based image understanding (if implemented)
-NumPy| Numerical computations (if implemented)
-OpenCV| Image processing (if implemented)
+1. Open the app.
+2. Choose a sample image or upload your own.
+3. Let the converter build the depth map and mesh.
+4. Orbit around the model and adjust the settings until it looks right.
+5. Switch render modes and lighting presets to inspect the surface.
+6. Export the finished model.
 
 ---
 
-🔮 Future Enhancements
+## 🌐 Deploy on Vercel
 
-- Real-time 2D-to-3D conversion
-- Improved depth estimation accuracy
-- Interactive 3D model visualization
-- Export support for ".obj", ".stl", and ".glb"
-- GPU-accelerated processing
-- Enhanced reconstruction quality
-- Integration with AR and VR applications
+1. Push the repo to GitHub.
+2. On [vercel.com](https://vercel.com) choose **Add New > Project** and import the repo.
+3. Vercel detects Vite automatically. Click **Deploy**.
+
+The current deployment lives at https://2d-to-3d-phi.vercel.app.
 
 ---
 
-🤝 Contributing
+## 📝 Notes
 
-Contributions, suggestions, and improvements are welcome.
+- Everything runs in your browser. Images are not uploaded to a server for the core conversion.
+- Remote sample images that block cross-origin access are retried through a public image proxy, and fall back to a placeholder if that fails.
+- A single image has no information about the hidden side of an object, so the back is a mirrored estimate. Results are strongest for compact, solid subjects on a plain background.
+
+---
+
+## 🔮 Future Scope
+
+- ⚡ Real-time 2D-to-3D conversion
+- 🎯 Improved depth estimation accuracy
+- 🧱 Export to `.obj` and `.stl`
+- 🚀 GPU-accelerated processing
+- 🥽 AR and VR integration
+
+---
+
+## 🤝 Contributing
+
+Contributions, suggestions and improvements are welcome.
 
 1. Fork the repository.
 2. Create a new branch.
-3. Implement your changes.
-4. Commit and push your changes.
-5. Submit a Pull Request.
+3. Make your changes.
+4. Commit and push.
+5. Open a Pull Request.
 
 ---
 
-📜 License
+## 📄 License
 
-This project is available under the license specified in the repository. See the "LICENSE" file for more information.
-
----
-
-<div align="center">Made with Python and Computer Vision
-
-"⬆ Back to Top" (#-2d-to-3d)
-
-</div>
+Released under the ISC license, as declared in `package.json`.
